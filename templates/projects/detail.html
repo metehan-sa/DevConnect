@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load markdown_extras %}
+
+{% block title %}{{ project.title }} — DevConnect{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <!-- Back to Projects -->
+    <div class="mb-6">
+        <a href="{% url 'projects:list' %}" class="inline-flex items-center space-x-1.5 text-sm text-slate-400 hover:text-white transition">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Tüm Projelere Dön</span>
+        </a>
+    </div>
+
+    <!-- Project Header -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 mb-8 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                {{ project.get_category_display }}
+            </span>
+
+            <div class="flex items-center space-x-4 text-xs text-slate-400">
+                <span class="flex items-center space-x-1">
+                    <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>{{ project.views_count }} görüntülenme</span>
+                </span>
+                <span>•</span>
+                <span>{{ project.created_at|date:"d F Y" }}</span>
+            </div>
+        </div>
+
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-6">
+            {{ project.title }}
+        </h1>
+
+        <!-- Author Bar & Actions -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-6 border-t border-slate-800/80">
+            <!-- Author Info -->
+            <div class="flex items-center space-x-3">
+                <a href="{% url 'accounts:profile' project.author.username %}">
+                    <img src="{{ project.author.profile.avatar_url }}" alt="{{ project.author.username }}" class="w-11 h-11 rounded-2xl object-cover border border-slate-700 bg-slate-800">
+                </a>
+                <div>
+                    <a href="{% url 'accounts:profile' project.author.username %}" class="text-sm font-bold text-white hover:text-indigo-400 transition">
+                        {{ project.author.get_display_name }}
+                    </a>
+                    <div class="text-xs text-slate-400">
+                        @{{ project.author.username }} · {{ project.author.profile.get_specialization_display }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap items-center gap-2.5">
+                <!-- Like Button -->
+                <form action="{% url 'projects:like' project.slug %}" method="POST" class="like-form inline-block">
+                    {% csrf_token %}
+                    <button type="submit" class="like-btn inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl border {% if user_has_liked %}bg-rose-500/10 border-rose-500/30 text-rose-400{% else %}bg-slate-800 border-slate-700 text-slate-300 hover:text-white{% endif %} transition">
+                        <svg class="heart-icon w-5 h-5 {% if user_has_liked %}text-rose-500 fill-current{% else %}text-slate-400{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        <span class="like-counter font-mono font-bold">{{ project.total_likes }}</span>
+                        <span class="text-xs">Beğeni</span>
+                    </button>
+                </form>
+
+                <!-- Live Demo Button -->
+                {% if project.demo_url %}
+                    <a href="{{ project.demo_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-500 shadow-md shadow-indigo-600/30 transition">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        <span>Canlı Demo</span>
+                    </a>
+                {% endif %}
+
+                <!-- GitHub Button -->
+                {% if project.github_url %}
+                    <a href="{{ project.github_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700 transition">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                        </svg>
+                        <span>GitHub</span>
+                    </a>
+                {% endif %}
+
+                <!-- Owner Actions -->
+                {% if user.is_authenticated and user == project.author %}
+                    <a href="{% url 'projects:edit' project.slug %}" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition" title="Düzenle">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                    </a>
+                    <a href="{% url 'projects:delete' project.slug %}" class="p-2.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 hover:text-rose-300 border border-rose-800/50 transition" title="Projeyi Sil">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Cover Image -->
+    <div class="mb-10 rounded-3xl overflow-hidden border border-slate-800 bg-slate-900 shadow-2xl">
+        <img src="{{ project.cover_url }}" alt="{{ project.title }}" class="w-full max-h-[500px] object-cover">
+    </div>
+
+    <!-- Tags & Tech Stack -->
+    {% if project.tags %}
+        <div class="mb-8">
+            <h3 class="text-xs uppercase tracking-wider font-semibold text-slate-400 mb-3">Kullanılan Teknolojiler</h3>
+            <div class="flex flex-wrap gap-2">
+                {% for tag in project.tags %}
+                    <a href="{% url 'projects:list' %}?tag={{ tag }}" class="px-3.5 py-1.5 rounded-xl text-xs font-mono bg-slate-900 hover:bg-indigo-950/60 text-indigo-300 border border-slate-800 hover:border-indigo-700/50 transition">
+                        #{{ tag }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Markdown Description -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 mb-12 shadow-xl">
+        <h2 class="text-xl font-bold text-white mb-6 pb-4 border-b border-slate-800">Proje Detayları & Açıklama</h2>
+        <div class="markdown-body">
+            {{ project.description|markdown }}
+        </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 mb-12 shadow-xl">
+        <div class="flex items-center justify-between mb-8">
+            <h3 class="text-2xl font-bold text-white tracking-tight">Yorumlar</h3>
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-slate-800 text-slate-300 border border-slate-700">
+                {{ project.total_comments }} Yorum
+            </span>
+        </div>
+
+        <!-- Add Comment Form -->
+        {% if user.is_authenticated %}
+            <form action="{% url 'projects:comment' project.slug %}" method="POST" class="mb-8">
+                {% csrf_token %}
+                <div class="flex items-start space-x-3">
+                    <img src="{{ user.profile.avatar_url }}" alt="{{ user.username }}" class="w-9 h-9 rounded-xl object-cover border border-slate-700 flex-shrink-0">
+                    <div class="flex-1">
+                        {{ comment_form.content }}
+                        <div class="mt-2 flex justify-end">
+                            <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-md shadow-indigo-600/20">
+                                Yorum Gönder
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        {% else %}
+            <div class="p-4 mb-8 rounded-2xl bg-slate-950 border border-slate-800 text-center text-sm text-slate-400">
+                Projeye yorum bırakmak için lütfen 
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="text-indigo-400 hover:underline font-semibold">Giriş Yapın</a> veya 
+                <a href="{% url 'accounts:register' %}" class="text-indigo-400 hover:underline font-semibold">Kayıt Olun</a>.
+            </div>
+        {% endif %}
+
+        <!-- Comments List -->
+        {% if comments %}
+            <div class="space-y-4">
+                {% for comment in comments %}
+                    <div class="p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center space-x-2.5">
+                                <a href="{% url 'accounts:profile' comment.author.username %}">
+                                    <img src="{{ comment.author.profile.avatar_url }}" alt="{{ comment.author.username }}" class="w-7 h-7 rounded-lg object-cover border border-slate-700">
+                                </a>
+                                <a href="{% url 'accounts:profile' comment.author.username %}" class="text-sm font-bold text-slate-200 hover:text-indigo-400">
+                                    {{ comment.author.get_display_name }}
+                                </a>
+                                <span class="text-xs text-slate-500">@{{ comment.author.username }}</span>
+                            </div>
+                            <span class="text-xs text-slate-500">{{ comment.created_at|timesince }} önce</span>
+                        </div>
+                        <p class="text-slate-300 text-sm pl-9 whitespace-pre-line leading-relaxed">{{ comment.content }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-slate-500 text-sm italic text-center py-6">Bu projeye henüz yorum yapılmadı. İlk yorumu siz yazın!</p>
+        {% endif %}
+    </div>
+
+    <!-- Related Projects by Author -->
+    {% if related_projects %}
+        <div class="pt-6 border-t border-slate-800">
+            <h3 class="text-xl font-bold text-white mb-6">Geliştiricinin Diğer Projeleri</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {% for p in related_projects %}
+                    {% include 'components/project_card.html' with project=p %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

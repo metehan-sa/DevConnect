@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} — DevConnect{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <div class="mb-8">
+        <a href="{% url 'projects:list' %}" class="inline-flex items-center space-x-1.5 text-sm text-slate-400 hover:text-white transition mb-3">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Projeler Listesine Dön</span>
+        </a>
+        <h1 class="text-3xl font-extrabold text-white tracking-tight">{{ title }}</h1>
+        <p class="text-slate-400 mt-1">Projenizin detaylarını doldurarak topluluk vitrinine ekleyin.</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="p-4 rounded-xl bg-rose-950/70 border border-rose-800 text-rose-300 text-sm">
+                {% for err in form.non_field_errors %}
+                    <p>{{ err }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Title -->
+        <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1.5">
+                Proje Başlığı <span class="text-rose-400">*</span>
+            </label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <p class="text-xs text-rose-400 mt-1">{{ form.title.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Category & Cover Image -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">
+                    Kategori <span class="text-rose-400">*</span>
+                </label>
+                {{ form.category }}
+                {% if form.category.errors %}
+                    <p class="text-xs text-rose-400 mt-1">{{ form.category.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">
+                    Kapak Görseli
+                </label>
+                {{ form.cover_image }}
+                <p class="text-xs text-slate-500 mt-1">Önerilen oran: 16:9 (JPG, PNG)</p>
+                {% if form.cover_image.errors %}
+                    <p class="text-xs text-rose-400 mt-1">{{ form.cover_image.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- URLs: Demo & GitHub -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">
+                    Canlı Demo URL'i
+                </label>
+                {{ form.demo_url }}
+                {% if form.demo_url.errors %}
+                    <p class="text-xs text-rose-400 mt-1">{{ form.demo_url.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">
+                    GitHub Deposu URL'i
+                </label>
+                {{ form.github_url }}
+                {% if form.github_url.errors %}
+                    <p class="text-xs text-rose-400 mt-1">{{ form.github_url.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tags -->
+        <div>
+            <label class="block text-sm font-medium text-slate-300 mb-1.5">
+                Kullanılan Teknolojiler / Etiketler
+            </label>
+            {{ form.tags_raw }}
+            <p class="text-xs text-slate-500 mt-1">Virgülle ayırarak yazın (Örn: Python, Django, Tailwind CSS, PostgreSQL)</p>
+            {% if form.tags_raw.errors %}
+                <p class="text-xs text-rose-400 mt-1">{{ form.tags_raw.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Markdown Description -->
+        <div>
+            <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-sm font-medium text-slate-300">
+                    Proje Açıklaması (Markdown) <span class="text-rose-400">*</span>
+                </label>
+                <span class="text-xs text-indigo-400 font-mono">Markdown Destekli</span>
+            </div>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <p class="text-xs text-rose-400 mt-1">{{ form.description.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Submit & Cancel -->
+        <div class="pt-4 border-t border-slate-800 flex items-center justify-end space-x-4">
+            <a href="{% if is_edit %}{% url 'projects:detail' project.slug %}{% else %}{% url 'projects:list' %}{% endif %}" class="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-white transition">
+                İptal
+            </a>
+            <button type="submit" class="px-7 py-3 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
+                {{ button_text }}
+            </button>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

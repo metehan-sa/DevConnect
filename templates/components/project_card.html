@@ -1,0 +1,88 @@
+<div class="glow-card flex flex-col bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition duration-300">
+    <!-- Card Cover -->
+    <a href="{% url 'projects:detail' project.slug %}" class="block relative aspect-video overflow-hidden group">
+        <img src="{{ project.cover_url }}" alt="{{ project.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 ease-out">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition"></div>
+        <div class="absolute top-3 left-3">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-900/90 text-indigo-400 border border-indigo-500/20 backdrop-blur-md">
+                {{ project.get_category_display }}
+            </span>
+        </div>
+    </a>
+
+    <!-- Card Content -->
+    <div class="flex-1 p-5 flex flex-col justify-between">
+        <div>
+            <!-- Author Header -->
+            <div class="flex items-center space-x-2.5 mb-3">
+                <a href="{% url 'accounts:profile' project.author.username %}" class="flex-shrink-0">
+                    <img src="{{ project.author.profile.avatar_url }}" alt="{{ project.author.username }}" class="w-7 h-7 rounded-full object-cover border border-slate-700">
+                </a>
+                <a href="{% url 'accounts:profile' project.author.username %}" class="text-xs font-medium text-slate-400 hover:text-slate-200 transition">
+                    @{{ project.author.username }}
+                </a>
+                <span class="text-slate-600 text-xs">•</span>
+                <span class="text-xs text-slate-500">{{ project.created_at|date:"d M Y" }}</span>
+            </div>
+
+            <!-- Title -->
+            <h3 class="text-lg font-bold text-white mb-2 line-clamp-1 hover:text-indigo-400 transition">
+                <a href="{% url 'projects:detail' project.slug %}">{{ project.title }}</a>
+            </h3>
+
+            <!-- Description Preview -->
+            <p class="text-slate-400 text-sm line-clamp-2 mb-4">
+                {{ project.description|truncatewords:20 }}
+            </p>
+        </div>
+
+        <div>
+            <!-- Tags -->
+            {% if project.tags %}
+                <div class="flex flex-wrap gap-1.5 mb-4">
+                    {% for tag in project.tags|slice:":3" %}
+                        <a href="{% url 'projects:list' %}?tag={{ tag }}" class="px-2 py-0.5 rounded text-xs font-mono bg-slate-800 text-slate-300 hover:bg-indigo-900/40 hover:text-indigo-300 border border-slate-700/60 transition">
+                            #{{ tag }}
+                        </a>
+                    {% endfor %}
+                    {% if project.tags|length > 3 %}
+                        <span class="text-xs text-slate-500 self-center">+{{ project.tags|length|add:"-3" }}</span>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <!-- Footer Stats & Actions -->
+            <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                <!-- Like Form / Counter -->
+                <form action="{% url 'projects:like' project.slug %}" method="POST" class="like-form inline-flex items-center">
+                    {% csrf_token %}
+                    <button type="submit" class="like-btn inline-flex items-center space-x-1.5 py-1 px-2.5 rounded-lg hover:bg-slate-800 border border-transparent transition">
+                        <svg class="heart-icon w-4 h-4 {% if user.is_authenticated and user in project.likes.all %}text-rose-500 fill-current{% else %}text-slate-400{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        <span class="like-counter font-medium">{{ project.total_likes }}</span>
+                    </button>
+                </form>
+
+                <div class="flex items-center space-x-3 text-slate-500">
+                    <!-- Comment count -->
+                    <span class="flex items-center space-x-1" title="Yorumlar">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        <span>{{ project.total_comments }}</span>
+                    </span>
+
+                    <!-- View count -->
+                    <span class="flex items-center space-x-1" title="Görüntülenme">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span>{{ project.views_count }}</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

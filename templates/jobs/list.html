@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}İş İlanları & Fırsatlar — DevConnect{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <!-- Header & Action -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight">Teknoloji & Yazılım İlanları</h1>
+            <p class="text-slate-400 mt-1">Yazılımcılar, tasarımcılar ve teknoloji liderleri için uzaktan ve hibrit kariyer fırsatları.</p>
+        </div>
+        {% if user.is_authenticated %}
+            <a href="{% url 'jobs:create' %}" class="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl font-semibold bg-emerald-600 text-white hover:bg-emerald-500 shadow-md shadow-emerald-600/30 transition self-start md:self-auto">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>İlan Ver</span>
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Filters Bar -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 mb-8 shadow-sm">
+        <form method="GET" action="{% url 'jobs:list' %}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
+            
+            <!-- Search -->
+            <div class="lg:col-span-5 relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input type="text" name="q" value="{{ query }}" placeholder="Pozisyon, şirket veya anahtar kelime..." class="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+            </div>
+
+            <!-- Location Type -->
+            <div class="lg:col-span-3">
+                <select name="location_type" class="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                    <option value="">Tüm Çalışma Modelleri</option>
+                    {% for code, label in location_type_choices %}
+                        <option value="{{ code }}" {% if selected_location_type == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Job Type -->
+            <div class="lg:col-span-2">
+                <select name="job_type" class="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                    <option value="">İstihdam Türü</option>
+                    {% for code, label in job_type_choices %}
+                        <option value="{{ code }}" {% if selected_job_type == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Submit -->
+            <div class="lg:col-span-2 flex space-x-2">
+                <button type="submit" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-semibold transition">
+                    Ara
+                </button>
+                {% if query or selected_location_type or selected_job_type %}
+                    <a href="{% url 'jobs:list' %}" class="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl text-sm transition">
+                        ✕
+                    </a>
+                {% endif %}
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Jobs Count -->
+    <div class="mb-4 text-xs font-mono text-slate-400">
+        {{ total_jobs }} aktif ilan listeleniyor
+    </div>
+
+    <!-- Jobs List -->
+    {% if jobs %}
+        <div class="space-y-4 mb-10">
+            {% for job in jobs %}
+                <a href="{% url 'jobs:detail' job.pk %}" class="glow-card block p-6 bg-slate-900 border border-slate-800 rounded-2xl hover:border-slate-700 transition">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        
+                        <div>
+                            <div class="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                                <span>{{ job.company_name }}</span>
+                                {% if job.location %}
+                                    <span class="text-slate-600">•</span>
+                                    <span>{{ job.location }}</span>
+                                {% endif %}
+                            </div>
+                            <h2 class="text-xl font-bold text-white hover:text-emerald-400 transition">{{ job.title }}</h2>
+                            <p class="text-slate-400 text-sm mt-2 line-clamp-2 max-w-3xl">{{ job.description|truncatewords:25 }}</p>
+                        </div>
+
+                        <!-- Right Badges -->
+                        <div class="flex sm:flex-col items-start sm:items-end justify-between sm:justify-center gap-2 flex-shrink-0">
+                            <span class="px-3 py-1 text-xs font-medium rounded-full {% if job.location_type == 'remote' %}bg-emerald-950/80 text-emerald-300 border border-emerald-800{% else %}bg-slate-800 text-slate-300 border border-slate-700{% endif %}">
+                                {{ job.get_location_type_display }}
+                            </span>
+                            <span class="text-xs text-slate-400">{{ job.get_job_type_display }}</span>
+                        </div>
+
+                    </div>
+
+                    <!-- Card Footer -->
+                    <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <div class="flex items-center space-x-4">
+                            {% if job.salary_range %}
+                                <span class="font-mono text-emerald-400 font-semibold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/40">
+                                    {{ job.salary_range }}
+                                </span>
+                            {% endif %}
+                            {% if job.deadline %}
+                                <span class="text-slate-400">Son Başvuru: {{ job.deadline|date:"d M Y" }}</span>
+                            {% endif %}
+                        </div>
+
+                        <span class="text-slate-500">{{ job.created_at|timesince }} önce yayınlandı</span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+            <div class="flex items-center justify-center space-x-2 pt-6 border-t border-slate-800">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}&q={{ query }}&location_type={{ selected_location_type }}&job_type={{ selected_job_type }}" class="px-4 py-2 rounded-xl bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-800 transition text-sm">
+                        ← Önceki
+                    </a>
+                {% endif %}
+
+                <span class="px-4 py-2 text-sm text-slate-400 font-mono">
+                    Sayfa {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&q={{ query }}&location_type={{ selected_location_type }}&job_type={{ selected_job_type }}" class="px-4 py-2 rounded-xl bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-800 transition text-sm">
+                        Sonraki →
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    {% else %}
+        <div class="text-center py-20 bg-slate-900/40 rounded-2xl border border-slate-800">
+            <svg class="w-12 h-12 text-slate-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <h3 class="text-lg font-medium text-slate-300">Aramanıza uygun ilan bulunamadı.</h3>
+            <p class="text-slate-500 text-sm mt-1">Farklı bir anahtar kelime deneyebilir veya yeni bir iş ilanı yayınlayabilirsiniz.</p>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Profili Düzenle — DevConnect{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <div class="mb-8">
+        <h1 class="text-3xl font-extrabold text-white tracking-tight">Profili Düzenle</h1>
+        <p class="text-slate-400 mt-1">DevConnect vitrininde görünecek geliştirici bilgilerinizi güncelleyin.</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-8">
+        {% csrf_token %}
+
+        <!-- Basic User Information Card -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+            <h3 class="text-lg font-bold text-white border-b border-slate-800 pb-3">Temel Kimlik Bilgileri</h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Ad</label>
+                    {{ u_form.first_name }}
+                    {% if u_form.first_name.errors %}
+                        <p class="text-xs text-rose-400 mt-1">{{ u_form.first_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Soyad</label>
+                    {{ u_form.last_name }}
+                    {% if u_form.last_name.errors %}
+                        <p class="text-xs text-rose-400 mt-1">{{ u_form.last_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">E-posta Adresi</label>
+                {{ u_form.email }}
+                {% if u_form.email.errors %}
+                    <p class="text-xs text-rose-400 mt-1">{{ u_form.email.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Developer Profile Card -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+            <h3 class="text-lg font-bold text-white border-b border-slate-800 pb-3">Geliştirici & Tasarımcı Detayları</h3>
+
+            <!-- Avatar -->
+            <div class="flex items-center space-x-6">
+                <img src="{{ user.profile.avatar_url }}" alt="{{ user.username }}" class="w-20 h-20 rounded-2xl object-cover border-2 border-indigo-500/40 bg-slate-800">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Profil Fotoğrafı</label>
+                    {{ p_form.avatar }}
+                    <p class="text-xs text-slate-500 mt-1">PNG, JPG veya WEBP (Maksimum 5MB)</p>
+                    {% if p_form.avatar.errors %}
+                        <p class="text-xs text-rose-400 mt-1">{{ p_form.avatar.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Uzmanlık Alanı</label>
+                    {{ p_form.specialization }}
+                    {% if p_form.specialization.errors %}
+                        <p class="text-xs text-rose-400 mt-1">{{ p_form.specialization.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Konum / Şehir</label>
+                    {{ p_form.location }}
+                    {% if p_form.location.errors %}
+                        <p class="text-xs text-rose-400 mt-1">{{ p_form.location.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Yetenekler & Teknolojiler</label>
+                {{ p_form.skills_raw }}
+                <p class="text-xs text-slate-500 mt-1">Örn: Python, Django, Tailwind CSS, PostgreSQL, React (Virgülle ayırın)</p>
+                {% if p_form.skills_raw.errors %}
+                    <p class="text-xs text-rose-400 mt-1">{{ p_form.skills_raw.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Biyografi</label>
+                {{ p_form.bio }}
+                {% if p_form.bio.errors %}
+                    <p class="text-xs text-rose-400 mt-1">{{ p_form.bio.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Social Links -->
+            <div class="space-y-4 pt-2">
+                <h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">Sosyal ve Portfolyo Bağlantıları</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">GitHub URL</label>
+                        {{ p_form.github_url }}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">LinkedIn URL</label>
+                        {{ p_form.linkedin_url }}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Web Sitesi</label>
+                        {{ p_form.website_url }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="flex items-center justify-end space-x-4">
+            <a href="{% url 'accounts:profile' user.username %}" class="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition">
+                İptal
+            </a>
+            <button type="submit" class="px-7 py-3 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
+                Değişiklikleri Kaydet
+            </button>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

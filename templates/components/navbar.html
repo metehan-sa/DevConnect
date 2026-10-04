@@ -1,0 +1,102 @@
+<header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-8">
+                <a href="{% url 'core:home' %}" class="flex items-center space-x-2.5 group">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition duration-200">
+                        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight text-white group-hover:text-indigo-400 transition">Dev<span class="text-indigo-400">Connect</span></span>
+                </a>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden md:flex items-center space-x-1">
+                    <a href="{% url 'core:home' %}" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+                        Ana Sayfa
+                    </a>
+                    <a href="{% url 'projects:list' %}" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+                        Projeler
+                    </a>
+                    <a href="{% url 'jobs:list' %}" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition">
+                        İş İlanları
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="hidden md:flex items-center space-x-3">
+                {% if user.is_authenticated %}
+                    <!-- Create Project Button -->
+                    <a href="{% url 'projects:create' %}" class="inline-flex items-center space-x-1.5 px-3.5 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 shadow-md shadow-indigo-600/25 transition">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>Proje Paylaş</span>
+                    </a>
+
+                    <!-- Post Job Button -->
+                    <a href="{% url 'jobs:create' %}" class="inline-flex items-center space-x-1 px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700 transition">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <span>İlan Ver</span>
+                    </a>
+
+                    <!-- Profile Link -->
+                    <a href="{% url 'accounts:profile' user.username %}" class="flex items-center space-x-2 pl-2 py-1 pr-3 rounded-lg hover:bg-slate-800/70 border border-transparent hover:border-slate-700 transition">
+                        <img src="{{ user.profile.avatar_url }}" alt="{{ user.username }}" class="w-8 h-8 rounded-full border border-indigo-500/50 object-cover bg-slate-800">
+                        <span class="text-sm font-medium text-slate-200">@{{ user.username }}</span>
+                    </a>
+
+                    <!-- Logout Button -->
+                    <a href="{% url 'accounts:logout' %}" title="Çıkış Yap" class="p-2 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800/60 transition">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                    </a>
+                {% else %}
+                    <!-- Guest Links -->
+                    <a href="{% url 'accounts:login' %}" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition">
+                        Giriş Yap
+                    </a>
+                    <a href="{% url 'accounts:register' %}" class="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 shadow-md shadow-indigo-600/20 transition">
+                        Kayıt Ol
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <div class="flex md:hidden">
+                <button type="button" id="mobile-menu-button" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none" aria-label="Menüyü Aç">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-4 space-y-2 bg-slate-900 border-b border-slate-800">
+        <a href="{% url 'core:home' %}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-200 hover:bg-slate-800">Ana Sayfa</a>
+        <a href="{% url 'projects:list' %}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-200 hover:bg-slate-800">Projeler</a>
+        <a href="{% url 'jobs:list' %}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-200 hover:bg-slate-800">İş İlanları</a>
+        
+        <div class="pt-3 border-t border-slate-800 space-y-2">
+            {% if user.is_authenticated %}
+                <a href="{% url 'projects:create' %}" class="block w-full text-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">+ Proje Paylaş</a>
+                <a href="{% url 'jobs:create' %}" class="block w-full text-center px-4 py-2 rounded-lg bg-slate-800 text-slate-200 font-medium">+ İlan Ver</a>
+                <a href="{% url 'accounts:profile' user.username %}" class="block px-3 py-2 rounded-lg text-base font-medium text-slate-200 hover:bg-slate-800">Profilim (@{{ user.username }})</a>
+                <a href="{% url 'accounts:logout' %}" class="block px-3 py-2 rounded-lg text-base font-medium text-rose-400 hover:bg-slate-800">Çıkış Yap</a>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="block w-full text-center px-4 py-2 rounded-lg bg-slate-800 text-slate-200 font-medium">Giriş Yap</a>
+                <a href="{% url 'accounts:register' %}" class="block w-full text-center px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium">Kayıt Ol</a>
+            {% endif %}
+        </div>
+    </div>
+</header>

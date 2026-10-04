@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Kayıt Ol — DevConnect{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-16rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-slate-900/80 p-8 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-sm">
+        
+        <!-- Header -->
+        <div class="text-center">
+            <div class="w-12 h-12 mx-auto rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-4">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-white tracking-tight">DevConnect'e Katılın</h2>
+            <p class="mt-2 text-sm text-slate-400">Portfolyonuzu sergileyin ve geliştirici ağına dahil olun</p>
+        </div>
+
+        <!-- Form Errors -->
+        {% if form.non_field_errors %}
+            <div class="p-3.5 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-sm">
+                {% for err in form.non_field_errors %}
+                    <p>{{ err }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Register Form -->
+        <form class="mt-6 space-y-4" method="POST" action="{% url 'accounts:register' %}">
+            {% csrf_token %}
+
+            <div>
+                <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-slate-300 mb-1">
+                    Kullanıcı Adı <span class="text-rose-400">*</span>
+                </label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <p class="text-xs text-rose-400 mt-1">{{ form.username.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-slate-300 mb-1">
+                        Ad
+                    </label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <p class="text-xs text-rose-400 mt-1">{{ form.first_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-slate-300 mb-1">
+                        Soyad
+                    </label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <p class="text-xs text-rose-400 mt-1">{{ form.last_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-slate-300 mb-1">
+                    E-posta Adresi <span class="text-rose-400">*</span>
+                </label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <p class="text-xs text-rose-400 mt-1">{{ form.email.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-slate-300 mb-1">
+                    Parola <span class="text-rose-400">*</span>
+                </label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <p class="text-xs text-rose-400 mt-1">{{ form.password.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.password_confirm.id_for_label }}" class="block text-sm font-medium text-slate-300 mb-1">
+                    Parola Tekrarı <span class="text-rose-400">*</span>
+                </label>
+                {{ form.password_confirm }}
+                {% if form.password_confirm.errors %}
+                    <p class="text-xs text-rose-400 mt-1">{{ form.password_confirm.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="w-full mt-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
+                Kayıt Ol ve Başla
+            </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="text-center pt-4 border-t border-slate-800 text-sm text-slate-400">
+            Zaten bir hesabınız var mı? 
+            <a href="{% url 'accounts:login' %}" class="font-medium text-indigo-400 hover:text-indigo-300">
+                Giriş Yapın
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
